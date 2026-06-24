@@ -24,6 +24,66 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type SpanEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	TimeNano      uint64                 `protobuf:"varint,2,opt,name=time_nano,json=timeNano,proto3" json:"time_nano,omitempty"`
+	Attrs         map[string]string      `protobuf:"bytes,3,rep,name=attrs,proto3" json:"attrs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SpanEvent) Reset() {
+	*x = SpanEvent{}
+	mi := &file_bus_bus_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SpanEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SpanEvent) ProtoMessage() {}
+
+func (x *SpanEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_bus_bus_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SpanEvent.ProtoReflect.Descriptor instead.
+func (*SpanEvent) Descriptor() ([]byte, []int) {
+	return file_bus_bus_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *SpanEvent) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SpanEvent) GetTimeNano() uint64 {
+	if x != nil {
+		return x.TimeNano
+	}
+	return 0
+}
+
+func (x *SpanEvent) GetAttrs() map[string]string {
+	if x != nil {
+		return x.Attrs
+	}
+	return nil
+}
+
 type Span struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TraceId       string                 `protobuf:"bytes,1,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"`
@@ -36,13 +96,15 @@ type Span struct {
 	StatusCode    string                 `protobuf:"bytes,8,opt,name=status_code,json=statusCode,proto3" json:"status_code,omitempty"`
 	Attrs         map[string]string      `protobuf:"bytes,9,rep,name=attrs,proto3" json:"attrs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	ResourceAttrs map[string]string      `protobuf:"bytes,10,rep,name=resource_attrs,json=resourceAttrs,proto3" json:"resource_attrs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	StatusMessage string                 `protobuf:"bytes,11,opt,name=status_message,json=statusMessage,proto3" json:"status_message,omitempty"`
+	Events        []*SpanEvent           `protobuf:"bytes,12,rep,name=events,proto3" json:"events,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Span) Reset() {
 	*x = Span{}
-	mi := &file_bus_bus_proto_msgTypes[0]
+	mi := &file_bus_bus_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -54,7 +116,7 @@ func (x *Span) String() string {
 func (*Span) ProtoMessage() {}
 
 func (x *Span) ProtoReflect() protoreflect.Message {
-	mi := &file_bus_bus_proto_msgTypes[0]
+	mi := &file_bus_bus_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -67,7 +129,7 @@ func (x *Span) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Span.ProtoReflect.Descriptor instead.
 func (*Span) Descriptor() ([]byte, []int) {
-	return file_bus_bus_proto_rawDescGZIP(), []int{0}
+	return file_bus_bus_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Span) GetTraceId() string {
@@ -140,6 +202,20 @@ func (x *Span) GetResourceAttrs() map[string]string {
 	return nil
 }
 
+func (x *Span) GetStatusMessage() string {
+	if x != nil {
+		return x.StatusMessage
+	}
+	return ""
+}
+
+func (x *Span) GetEvents() []*SpanEvent {
+	if x != nil {
+		return x.Events
+	}
+	return nil
+}
+
 type AssembledTrace struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TraceId       string                 `protobuf:"bytes,1,opt,name=trace_id,json=traceId,proto3" json:"trace_id,omitempty"`
@@ -151,7 +227,7 @@ type AssembledTrace struct {
 
 func (x *AssembledTrace) Reset() {
 	*x = AssembledTrace{}
-	mi := &file_bus_bus_proto_msgTypes[1]
+	mi := &file_bus_bus_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -163,7 +239,7 @@ func (x *AssembledTrace) String() string {
 func (*AssembledTrace) ProtoMessage() {}
 
 func (x *AssembledTrace) ProtoReflect() protoreflect.Message {
-	mi := &file_bus_bus_proto_msgTypes[1]
+	mi := &file_bus_bus_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -176,7 +252,7 @@ func (x *AssembledTrace) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AssembledTrace.ProtoReflect.Descriptor instead.
 func (*AssembledTrace) Descriptor() ([]byte, []int) {
-	return file_bus_bus_proto_rawDescGZIP(), []int{1}
+	return file_bus_bus_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AssembledTrace) GetTraceId() string {
@@ -216,7 +292,7 @@ type CanonicalizedTrace struct {
 
 func (x *CanonicalizedTrace) Reset() {
 	*x = CanonicalizedTrace{}
-	mi := &file_bus_bus_proto_msgTypes[2]
+	mi := &file_bus_bus_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -228,7 +304,7 @@ func (x *CanonicalizedTrace) String() string {
 func (*CanonicalizedTrace) ProtoMessage() {}
 
 func (x *CanonicalizedTrace) ProtoReflect() protoreflect.Message {
-	mi := &file_bus_bus_proto_msgTypes[2]
+	mi := &file_bus_bus_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -241,7 +317,7 @@ func (x *CanonicalizedTrace) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CanonicalizedTrace.ProtoReflect.Descriptor instead.
 func (*CanonicalizedTrace) Descriptor() ([]byte, []int) {
-	return file_bus_bus_proto_rawDescGZIP(), []int{2}
+	return file_bus_bus_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CanonicalizedTrace) GetRootHash() string {
@@ -269,7 +345,15 @@ var File_bus_bus_proto protoreflect.FileDescriptor
 
 const file_bus_bus_proto_rawDesc = "" +
 	"\n" +
-	"\rbus/bus.proto\x12\x03bus\"\xc7\x03\n" +
+	"\rbus/bus.proto\x12\x03bus\"\xa7\x01\n" +
+	"\tSpanEvent\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
+	"\ttime_nano\x18\x02 \x01(\x04R\btimeNano\x12/\n" +
+	"\x05attrs\x18\x03 \x03(\v2\x19.bus.SpanEvent.AttrsEntryR\x05attrs\x1a8\n" +
+	"\n" +
+	"AttrsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x96\x04\n" +
 	"\x04Span\x12\x19\n" +
 	"\btrace_id\x18\x01 \x01(\tR\atraceId\x12\x17\n" +
 	"\aspan_id\x18\x02 \x01(\tR\x06spanId\x12\x1b\n" +
@@ -283,7 +367,9 @@ const file_bus_bus_proto_rawDesc = "" +
 	"statusCode\x12*\n" +
 	"\x05attrs\x18\t \x03(\v2\x14.bus.Span.AttrsEntryR\x05attrs\x12C\n" +
 	"\x0eresource_attrs\x18\n" +
-	" \x03(\v2\x1c.bus.Span.ResourceAttrsEntryR\rresourceAttrs\x1a8\n" +
+	" \x03(\v2\x1c.bus.Span.ResourceAttrsEntryR\rresourceAttrs\x12%\n" +
+	"\x0estatus_message\x18\v \x01(\tR\rstatusMessage\x12&\n" +
+	"\x06events\x18\f \x03(\v2\x0e.bus.SpanEventR\x06events\x1a8\n" +
 	"\n" +
 	"AttrsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -315,26 +401,30 @@ func file_bus_bus_proto_rawDescGZIP() []byte {
 	return file_bus_bus_proto_rawDescData
 }
 
-var file_bus_bus_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_bus_bus_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_bus_bus_proto_goTypes = []any{
-	(*Span)(nil),               // 0: bus.Span
-	(*AssembledTrace)(nil),     // 1: bus.AssembledTrace
-	(*CanonicalizedTrace)(nil), // 2: bus.CanonicalizedTrace
-	nil,                        // 3: bus.Span.AttrsEntry
-	nil,                        // 4: bus.Span.ResourceAttrsEntry
-	nil,                        // 5: bus.CanonicalizedTrace.SpanNodeHashesEntry
+	(*SpanEvent)(nil),          // 0: bus.SpanEvent
+	(*Span)(nil),               // 1: bus.Span
+	(*AssembledTrace)(nil),     // 2: bus.AssembledTrace
+	(*CanonicalizedTrace)(nil), // 3: bus.CanonicalizedTrace
+	nil,                        // 4: bus.SpanEvent.AttrsEntry
+	nil,                        // 5: bus.Span.AttrsEntry
+	nil,                        // 6: bus.Span.ResourceAttrsEntry
+	nil,                        // 7: bus.CanonicalizedTrace.SpanNodeHashesEntry
 }
 var file_bus_bus_proto_depIdxs = []int32{
-	3, // 0: bus.Span.attrs:type_name -> bus.Span.AttrsEntry
-	4, // 1: bus.Span.resource_attrs:type_name -> bus.Span.ResourceAttrsEntry
-	0, // 2: bus.AssembledTrace.spans:type_name -> bus.Span
-	1, // 3: bus.CanonicalizedTrace.trace:type_name -> bus.AssembledTrace
-	5, // 4: bus.CanonicalizedTrace.span_node_hashes:type_name -> bus.CanonicalizedTrace.SpanNodeHashesEntry
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	4, // 0: bus.SpanEvent.attrs:type_name -> bus.SpanEvent.AttrsEntry
+	5, // 1: bus.Span.attrs:type_name -> bus.Span.AttrsEntry
+	6, // 2: bus.Span.resource_attrs:type_name -> bus.Span.ResourceAttrsEntry
+	0, // 3: bus.Span.events:type_name -> bus.SpanEvent
+	1, // 4: bus.AssembledTrace.spans:type_name -> bus.Span
+	2, // 5: bus.CanonicalizedTrace.trace:type_name -> bus.AssembledTrace
+	7, // 6: bus.CanonicalizedTrace.span_node_hashes:type_name -> bus.CanonicalizedTrace.SpanNodeHashesEntry
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_bus_bus_proto_init() }
@@ -348,7 +438,7 @@ func file_bus_bus_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bus_bus_proto_rawDesc), len(file_bus_bus_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

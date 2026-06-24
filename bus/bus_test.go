@@ -128,3 +128,50 @@ func TestAssembledTraceRoundTrip(t *testing.T) {
 		})
 	}
 }
+
+func TestSpanStatusMessageAndEventsRoundTrip(t *testing.T) {
+	in := &Span{
+		TraceId: "t", SpanId: "s", Name: "POST /pay", Kind: "CLIENT",
+		StatusCode:    "ERROR",
+		StatusMessage: "boom",
+		Attrs:         map[string]string{"http.request.method": "POST"},
+		Events: []*SpanEvent{
+			{
+				Name:     "exception",
+				TimeNano: 1_700_000_000_000,
+				Attrs: map[string]string{
+					"exception.type":    "NullPointerException",
+					"exception.message": "npe",
+				},
+			},
+			{Name: "retry", TimeNano: 1_700_000_000_500},
+		},
+	}
+	b, err := proto.Marshal(in)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	var out Span
+	if err := proto.Unmarshal(b, &out); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if out.StatusMessage != "boom" {
+		t.Fatalf("StatusMessage mismatch: got %q", out.StatusMessage)
+	}
+	if len(out.Events) != 2 {
+		t.Fatalf("len(Events) mismatch: want 2 got %d", len(out.Events))
+	}
+	if out.Events[0].Name != "exception" {
+		t.Fatalf("Events[0].Name mismatch: got %q", out.Events[0].Name)
+	}
+	if out.Events[0].TimeNano != 1_700_000_000_000 {
+		t.Fatalf("Events[0].TimeNano mismatch: got %d", out.Events[0].TimeNano)
+	}
+	if out.Events[0].Attrs["exception.type"] != "NullPointerException" {
+		t.Fatalf("Events[0].Attrs[exception.type] mismatch: got %q", out.Events[0].Attrs["exception.type"])
+	}
+	// pre-existing fields unaffected
+	if out.StatusCode != "ERROR" || out.Attrs["http.request.method"] != "POST" {
+		t.Fatalf("pre-existing fields altered: status=%q attrs=%v", out.StatusCode, out.Attrs)
+	}
+}
