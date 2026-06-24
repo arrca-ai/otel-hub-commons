@@ -1,0 +1,35 @@
+// SPDX-License-Identifier: Apache-2.0
+// bus/bus.proto
+syntax = "proto3";
+package bus;
+option go_package = "github.com/arrca-ai/otel-hub-commons/bus";
+
+message Span {
+  string trace_id = 1;
+  string span_id = 2;
+  string parent_id = 3;
+  string name = 4;
+  string kind = 5;
+  uint64 start_nano = 6;
+  uint64 end_nano = 7;
+  string status_code = 8;
+  map<string, string> attrs = 9;
+  map<string, string> resource_attrs = 10;
+}
+
+message AssembledTrace {
+  string trace_id = 1;
+  repeated Span spans = 2;
+  bool connected = 3;
+}
+
+// CanonicalizedTrace pairs a finalized trace with the canonical flow it
+// collapsed into: root_hash is the flow id (canonical Merkle root), trace is
+// the original timed spans verbatim, and span_node_hashes maps each span_id to
+// the hash of the canonical node it produced. Many spans (retries / fan-out)
+// may share one node hash — that is the intended structural grouping.
+message CanonicalizedTrace {
+  string root_hash = 1;
+  AssembledTrace trace = 2;
+  map<string, string> span_node_hashes = 3;
+}
