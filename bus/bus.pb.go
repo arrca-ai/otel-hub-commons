@@ -341,6 +341,109 @@ func (x *CanonicalizedTrace) GetSpanNodeHashes() map[string]string {
 	return nil
 }
 
+// K8sEntityEvent is a Kubernetes control-plane state transition observed by
+// graph-k8s and published to NATS, partitioned by hash(entity_id) % N. kind is
+// one of "pod_restart" | "phase_change" | "image_change".
+type K8SEntityEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EntityId      string                 `protobuf:"bytes,1,opt,name=entity_id,json=entityId,proto3" json:"entity_id,omitempty"` // partition key: "pod:ns/name" | "deployment:ns/name"
+	Kind          string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"`
+	TsMs          int64                  `protobuf:"varint,3,opt,name=ts_ms,json=tsMs,proto3" json:"ts_ms,omitempty"` // observation time, ms since epoch
+	Namespace     string                 `protobuf:"bytes,4,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	Container     string                 `protobuf:"bytes,5,opt,name=container,proto3" json:"container,omitempty"`               // restart / pod-image events; empty otherwise
+	OldValue      string                 `protobuf:"bytes,6,opt,name=old_value,json=oldValue,proto3" json:"old_value,omitempty"` // prev phase / restart count / old image
+	NewValue      string                 `protobuf:"bytes,7,opt,name=new_value,json=newValue,proto3" json:"new_value,omitempty"` // new phase / restart count / new image
+	Reason        string                 `protobuf:"bytes,8,opt,name=reason,proto3" json:"reason,omitempty"`                     // lastState.terminated.reason; empty otherwise
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *K8SEntityEvent) Reset() {
+	*x = K8SEntityEvent{}
+	mi := &file_bus_bus_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *K8SEntityEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*K8SEntityEvent) ProtoMessage() {}
+
+func (x *K8SEntityEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_bus_bus_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use K8SEntityEvent.ProtoReflect.Descriptor instead.
+func (*K8SEntityEvent) Descriptor() ([]byte, []int) {
+	return file_bus_bus_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *K8SEntityEvent) GetEntityId() string {
+	if x != nil {
+		return x.EntityId
+	}
+	return ""
+}
+
+func (x *K8SEntityEvent) GetKind() string {
+	if x != nil {
+		return x.Kind
+	}
+	return ""
+}
+
+func (x *K8SEntityEvent) GetTsMs() int64 {
+	if x != nil {
+		return x.TsMs
+	}
+	return 0
+}
+
+func (x *K8SEntityEvent) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
+func (x *K8SEntityEvent) GetContainer() string {
+	if x != nil {
+		return x.Container
+	}
+	return ""
+}
+
+func (x *K8SEntityEvent) GetOldValue() string {
+	if x != nil {
+		return x.OldValue
+	}
+	return ""
+}
+
+func (x *K8SEntityEvent) GetNewValue() string {
+	if x != nil {
+		return x.NewValue
+	}
+	return ""
+}
+
+func (x *K8SEntityEvent) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
 var File_bus_bus_proto protoreflect.FileDescriptor
 
 const file_bus_bus_proto_rawDesc = "" +
@@ -387,7 +490,16 @@ const file_bus_bus_proto_rawDesc = "" +
 	"\x10span_node_hashes\x18\x03 \x03(\v2+.bus.CanonicalizedTrace.SpanNodeHashesEntryR\x0espanNodeHashes\x1aA\n" +
 	"\x13SpanNodeHashesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B*Z(github.com/arrca-ai/otel-hub-commons/busb\x06proto3"
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe4\x01\n" +
+	"\x0eK8sEntityEvent\x12\x1b\n" +
+	"\tentity_id\x18\x01 \x01(\tR\bentityId\x12\x12\n" +
+	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x13\n" +
+	"\x05ts_ms\x18\x03 \x01(\x03R\x04tsMs\x12\x1c\n" +
+	"\tnamespace\x18\x04 \x01(\tR\tnamespace\x12\x1c\n" +
+	"\tcontainer\x18\x05 \x01(\tR\tcontainer\x12\x1b\n" +
+	"\told_value\x18\x06 \x01(\tR\boldValue\x12\x1b\n" +
+	"\tnew_value\x18\a \x01(\tR\bnewValue\x12\x16\n" +
+	"\x06reason\x18\b \x01(\tR\x06reasonB*Z(github.com/arrca-ai/otel-hub-commons/busb\x06proto3"
 
 var (
 	file_bus_bus_proto_rawDescOnce sync.Once
@@ -401,25 +513,26 @@ func file_bus_bus_proto_rawDescGZIP() []byte {
 	return file_bus_bus_proto_rawDescData
 }
 
-var file_bus_bus_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_bus_bus_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_bus_bus_proto_goTypes = []any{
 	(*SpanEvent)(nil),          // 0: bus.SpanEvent
 	(*Span)(nil),               // 1: bus.Span
 	(*AssembledTrace)(nil),     // 2: bus.AssembledTrace
 	(*CanonicalizedTrace)(nil), // 3: bus.CanonicalizedTrace
-	nil,                        // 4: bus.SpanEvent.AttrsEntry
-	nil,                        // 5: bus.Span.AttrsEntry
-	nil,                        // 6: bus.Span.ResourceAttrsEntry
-	nil,                        // 7: bus.CanonicalizedTrace.SpanNodeHashesEntry
+	(*K8SEntityEvent)(nil),     // 4: bus.K8sEntityEvent
+	nil,                        // 5: bus.SpanEvent.AttrsEntry
+	nil,                        // 6: bus.Span.AttrsEntry
+	nil,                        // 7: bus.Span.ResourceAttrsEntry
+	nil,                        // 8: bus.CanonicalizedTrace.SpanNodeHashesEntry
 }
 var file_bus_bus_proto_depIdxs = []int32{
-	4, // 0: bus.SpanEvent.attrs:type_name -> bus.SpanEvent.AttrsEntry
-	5, // 1: bus.Span.attrs:type_name -> bus.Span.AttrsEntry
-	6, // 2: bus.Span.resource_attrs:type_name -> bus.Span.ResourceAttrsEntry
+	5, // 0: bus.SpanEvent.attrs:type_name -> bus.SpanEvent.AttrsEntry
+	6, // 1: bus.Span.attrs:type_name -> bus.Span.AttrsEntry
+	7, // 2: bus.Span.resource_attrs:type_name -> bus.Span.ResourceAttrsEntry
 	0, // 3: bus.Span.events:type_name -> bus.SpanEvent
 	1, // 4: bus.AssembledTrace.spans:type_name -> bus.Span
 	2, // 5: bus.CanonicalizedTrace.trace:type_name -> bus.AssembledTrace
-	7, // 6: bus.CanonicalizedTrace.span_node_hashes:type_name -> bus.CanonicalizedTrace.SpanNodeHashesEntry
+	8, // 6: bus.CanonicalizedTrace.span_node_hashes:type_name -> bus.CanonicalizedTrace.SpanNodeHashesEntry
 	7, // [7:7] is the sub-list for method output_type
 	7, // [7:7] is the sub-list for method input_type
 	7, // [7:7] is the sub-list for extension type_name
@@ -438,7 +551,7 @@ func file_bus_bus_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bus_bus_proto_rawDesc), len(file_bus_bus_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

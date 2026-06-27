@@ -41,3 +41,17 @@ message CanonicalizedTrace {
   AssembledTrace trace = 2;
   map<string, string> span_node_hashes = 3;
 }
+
+// K8sEntityEvent is a Kubernetes control-plane state transition observed by
+// graph-k8s and published to NATS, partitioned by hash(entity_id) % N. kind is
+// one of "pod_restart" | "phase_change" | "image_change".
+message K8sEntityEvent {
+  string entity_id = 1;   // partition key: "pod:ns/name" | "deployment:ns/name"
+  string kind      = 2;
+  int64  ts_ms     = 3;   // observation time, ms since epoch
+  string namespace = 4;
+  string container = 5;   // restart / pod-image events; empty otherwise
+  string old_value = 6;   // prev phase / restart count / old image
+  string new_value = 7;   // new phase / restart count / new image
+  string reason    = 8;   // lastState.terminated.reason; empty otherwise
+}

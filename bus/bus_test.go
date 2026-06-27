@@ -129,6 +129,24 @@ func TestAssembledTraceRoundTrip(t *testing.T) {
 	}
 }
 
+func TestK8sEntityEventRoundTrip(t *testing.T) {
+	in := &K8SEntityEvent{
+		EntityId: "pod:default/web-abc", Kind: "pod_restart", TsMs: 1719500000000,
+		Namespace: "default", Container: "web", OldValue: "3", NewValue: "4", Reason: "OOMKilled",
+	}
+	data, err := proto.Marshal(in)
+	if err != nil {
+		t.Fatalf("marshal: %v", err)
+	}
+	var out K8SEntityEvent
+	if err := proto.Unmarshal(data, &out); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if out.EntityId != in.EntityId || out.Kind != in.Kind || out.Reason != in.Reason || out.NewValue != in.NewValue {
+		t.Fatalf("round-trip mismatch: got %+v want %+v", &out, in)
+	}
+}
+
 func TestSpanStatusMessageAndEventsRoundTrip(t *testing.T) {
 	in := &Span{
 		TraceId: "t", SpanId: "s", Name: "POST /pay", Kind: "CLIENT",
