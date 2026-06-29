@@ -25,6 +25,12 @@ const (
 	attrRPCService = "rpc.service"
 	attrRPCMethod  = "rpc.method"
 	attrSpanName   = "span.name"
+
+	attrMsgSystem  = "messaging.system"
+	attrMsgOp      = "messaging.operation"
+	attrMsgOpType  = "messaging.operation.type" // newer semconv
+	attrMsgDest    = "messaging.destination.name"
+	attrMsgDestOld = "messaging.destination" // legacy
 )
 
 // SeriesAttrs rebuilds the templatized per-span attribute map the derivers
@@ -165,6 +171,69 @@ func HTTPSpanName(attrs map[string]string) (string, bool) {
 		return "", false
 	}
 	return method + " " + NormalizeRoute(route), true
+}
+
+// MessagingSpanName returns a canonical "<system>.<operation> <destination>" name
+// for a messaging span (e.g. "nats.publish metrics.part.{n}"), with numeric tokens
+// in the destination — partition/shard indices, which are high-cardinality —
+// collapsed to {n}. Without this, a fan-out that publishes to N partitioned
+// subjects (metrics.part.0 … metrics.part.255) mints N distinct node names and
+// never canonicalizes to a single fanned-out node. ok is false when the span is
+// not a messaging span (no messaging.system, or no destination).
+//
+// The operation is optional: with it the name is "<system>.<operation> <dest>",
+// without it just "<system> <dest>". destination prefers
+// messaging.destination.name and falls back to the legacy messaging.destination;
+// operation prefers messaging.operation and falls back to
+// messaging.operation.type. Idempotent.
+func MessagingSpanName(attrs map[string]string) (string, bool) {
+	system := attrs[attrMsgSystem]
+	if system == "" {
+		return "", false
+	}
+	dest := attrs[attrMsgDest]
+	if dest == "" {
+		dest = attrs[attrMsgDestOld]
+	}
+	if dest == "" {
+		return "", false
+	}
+	prefix := system
+	op := attrs[attrMsgOp]
+	if op == "" {
+		op = attrs[attrMsgOpType]
+	}
+	if op != "" {
+		prefix = system + "." + op
+	}
+	return prefix + " " + templatizeDestination(dest), true
+}
+
+// templatizeDestination collapses every all-digit token of a messaging
+// destination to {n}. Tokens are delimited by the separators common to subjects
+// and topics ('.', '/', '-', ':'); the separators are preserved. Idempotent
+// ("{n}" is not all-digits, so re-applying is a no-op).
+func templatizeDestination(dest string) string {
+	var b strings.Builder
+	b.Grow(len(dest) + 4)
+	start := 0
+	flush := func(end int) {
+		if tok := dest[start:end]; isAllDigits(tok) {
+			b.WriteString("{n}")
+		} else {
+			b.WriteString(tok)
+		}
+	}
+	for i := 0; i < len(dest); i++ {
+		switch dest[i] {
+		case '.', '/', '-', ':':
+			flush(i)
+			b.WriteByte(dest[i])
+			start = i + 1
+		}
+	}
+	flush(len(dest))
+	return b.String()
 }
 
 // RPCSystemAndRoute derives the RPC protocol and route-equivalent for a span,
