@@ -354,6 +354,7 @@ type K8SEntityEvent struct {
 	OldValue      string                 `protobuf:"bytes,6,opt,name=old_value,json=oldValue,proto3" json:"old_value,omitempty"` // prev phase / restart count / old image
 	NewValue      string                 `protobuf:"bytes,7,opt,name=new_value,json=newValue,proto3" json:"new_value,omitempty"` // new phase / restart count / new image
 	Reason        string                 `protobuf:"bytes,8,opt,name=reason,proto3" json:"reason,omitempty"`                     // lastState.terminated.reason; empty otherwise
+	Pod           string                 `protobuf:"bytes,9,opt,name=pod,proto3" json:"pod,omitempty"`                           // pod name for pod-scoped events; empty otherwise
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -444,6 +445,13 @@ func (x *K8SEntityEvent) GetReason() string {
 	return ""
 }
 
+func (x *K8SEntityEvent) GetPod() string {
+	if x != nil {
+		return x.Pod
+	}
+	return ""
+}
+
 var File_bus_bus_proto protoreflect.FileDescriptor
 
 const file_bus_bus_proto_rawDesc = "" +
@@ -490,7 +498,7 @@ const file_bus_bus_proto_rawDesc = "" +
 	"\x10span_node_hashes\x18\x03 \x03(\v2+.bus.CanonicalizedTrace.SpanNodeHashesEntryR\x0espanNodeHashes\x1aA\n" +
 	"\x13SpanNodeHashesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe4\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xf6\x01\n" +
 	"\x0eK8sEntityEvent\x12\x1b\n" +
 	"\tentity_id\x18\x01 \x01(\tR\bentityId\x12\x12\n" +
 	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x13\n" +
@@ -499,7 +507,8 @@ const file_bus_bus_proto_rawDesc = "" +
 	"\tcontainer\x18\x05 \x01(\tR\tcontainer\x12\x1b\n" +
 	"\told_value\x18\x06 \x01(\tR\boldValue\x12\x1b\n" +
 	"\tnew_value\x18\a \x01(\tR\bnewValue\x12\x16\n" +
-	"\x06reason\x18\b \x01(\tR\x06reasonB*Z(github.com/arrca-ai/otel-hub-commons/busb\x06proto3"
+	"\x06reason\x18\b \x01(\tR\x06reason\x12\x10\n" +
+	"\x03pod\x18\t \x01(\tR\x03podB*Z(github.com/arrca-ai/otel-hub-commons/busb\x06proto3"
 
 var (
 	file_bus_bus_proto_rawDescOnce sync.Once

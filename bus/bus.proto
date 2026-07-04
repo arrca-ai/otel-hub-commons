@@ -54,4 +54,5 @@ message K8sEntityEvent {
   string old_value = 6;   // prev phase / restart count / old image
   string new_value = 7;   // new phase / restart count / new image
   string reason    = 8;   // lastState.terminated.reason; empty otherwise
+  string pod       = 9;   // pod name for pod-scoped events; empty otherwise
 }

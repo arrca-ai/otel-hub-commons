@@ -133,6 +133,7 @@ func TestK8sEntityEventRoundTrip(t *testing.T) {
 	in := &K8SEntityEvent{
 		EntityId: "pod:default/web-abc", Kind: "pod_restart", TsMs: 1719500000000,
 		Namespace: "default", Container: "web", OldValue: "3", NewValue: "4", Reason: "OOMKilled",
+		Pod: "api-7d9f8-xk2p9",
 	}
 	data, err := proto.Marshal(in)
 	if err != nil {
@@ -144,6 +145,9 @@ func TestK8sEntityEventRoundTrip(t *testing.T) {
 	}
 	if out.EntityId != in.EntityId || out.Kind != in.Kind || out.Reason != in.Reason || out.NewValue != in.NewValue {
 		t.Fatalf("round-trip mismatch: got %+v want %+v", &out, in)
+	}
+	if out.Pod != in.Pod {
+		t.Fatalf("Pod mismatch: got %q want %q", out.Pod, in.Pod)
 	}
 }
 
